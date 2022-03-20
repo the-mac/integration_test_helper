@@ -58,6 +58,7 @@ class _CounterPageState extends State<CounterPage> {
             ),
             Text(
               '$_counter',
+              key: const Key('counter-page-text'),
               style: Theme.of(context).textTheme.headline4,
             ),
           ],

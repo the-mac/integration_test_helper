@@ -9,6 +9,7 @@ class HelloPage extends StatelessWidget {
     return const Center(
       child: Text(
         'Hello, Flutter!',
+        key: Key('hello-page-text'),
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Color(0xff0085E0),

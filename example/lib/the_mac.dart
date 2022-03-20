@@ -1,6 +1,10 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
-import 'package:share/share.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+Map launchResults = {};
 
 class SocialButton extends InkWell {
   SocialButton(String title, Color color, IconData icon, {Key? key, required Function() onTap})
@@ -37,7 +41,41 @@ class SocialButton extends InkWell {
         );
 }
 
+class WebViewContainer extends StatelessWidget {
+
+  final String webViewUrl;
+
+  const WebViewContainer(this.webViewUrl, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+
+    return Scaffold(
+      appBar: AppBar(),
+      body: Container(
+          child: WebView(
+            initialUrl: webViewUrl,
+            javascriptMode: JavascriptMode.unrestricted,
+            onPageFinished: (url) {
+                print('url: $url');
+                launchResults[url] = true;
+            },
+            debuggingEnabled: false,
+          ),
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.blue)
+          ),
+      ),
+    );
+  }
+}
+
 class TheMACPage extends StatelessWidget {
+
+  static const shareURL = 'https://pub.dev/packages/integration_test_helper';
+  static const facebookURL = 'https://m.facebook.com/groups/694991294608697/';
+  static const githubURL = 'https://github.com/the-mac';
+
   const TheMACPage({Key? key}) : super(key: key);
 
   @override
@@ -65,27 +103,33 @@ class TheMACPage extends StatelessWidget {
             height: 250,
           ),
           SocialButton(
-            'Share Driver Manager',
+            'Share Integration Test Helper',
             const Color(0xff0085E0),
             Icons.share,
             onTap: () {
-                Share.share('https://pub.dev/packages/drawer_manager', subject: 'Check out our package on pub.dev!');
+                Navigator.push<void>(
+                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(shareURL))
+                );
             }
           ),
           SocialButton(
             'Check out our Facebook',
             const Color(0xff39579A),
             FontAwesomeIcons.facebookF,
-            onTap: () {
-
+            onTap: () async {
+                Navigator.push<void>(
+                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(facebookURL))
+                );
             }
           ),
           SocialButton(
             'Check out our Github',
             Colors.black,
             FontAwesomeIcons.github,
-            onTap: () {
-
+            onTap: () async {
+                Navigator.push<void>(
+                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(githubURL))
+                );
             }
           ),
         ],
