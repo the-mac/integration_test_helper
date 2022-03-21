@@ -8,7 +8,7 @@ import 'counter.dart';
 import 'languages.dart';
 import 'the_mac.dart';
 
-// clear && printf '\e[3J' && flutter clean && flutter run ; flutter clean
+// clear && printf '\e[3J' && flutter run ; flutter clean
 
 void main() {
   runApp(setupMainWidget());
