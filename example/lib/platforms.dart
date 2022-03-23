@@ -8,21 +8,19 @@ class PlatformApp extends PlatformWidget {
     Key? key,
     required MaterialApp androidApp,
     required CupertinoApp iosApp,
-    TargetPlatform? defaultPlatform,
+    required TargetPlatform defaultPlatform,
   }) : super(key: key,
       androidBuilder: (BuildContext context) => androidApp,
       iosBuilder:  (BuildContext context) => iosApp
     ) {
-      if(defaultPlatform != null) {
-          PlatformWidget.setPlatform(defaultPlatform);
-      }
+      PlatformWidget.setPlatform(defaultPlatform);
   }
 
 }
 
 class PlatformWidget extends StatefulWidget {
   
-  static TargetPlatform? _defaultPlatform;// = Platform.isAndroid ? TargetPlatform.android : TargetPlatform.iOS;
+  static TargetPlatform? _defaultPlatform;
 
   static get platform {
       if(_defaultPlatform == null) {

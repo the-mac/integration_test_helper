@@ -12,25 +12,18 @@ import 'app_test_groups.dart';
 
 void main() async {
 
-    IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    
-    group('end-to-end test', () {
+    IntegrationTestWidgetsFlutterBinding.ensureInitialized();    
+
+    testWidgets('Testing end to end single-screen integration', (WidgetTester tester) async {
       
-        ScreenIntegrationTestGroups integrationTestGroups;
+          final main = app.setupMainWidget();            
+          final integrationTestGroups = ScreenIntegrationTestGroups();
+          await integrationTestGroups.initializeTests(tester, main);
 
-        testWidgets('Testing end to end single-screen integration', (WidgetTester tester) async {
+          await integrationTestGroups.testEndToEndUsing(TargetPlatform.android);
+          await integrationTestGroups.testEndToEndUsing(TargetPlatform.iOS);
 
-            final main = app.setupMainWidget();
-            WidgetsApp.debugAllowBannerOverride = false;
-            await tester.pumpWidget(main);
-            
-            integrationTestGroups = ScreenIntegrationTestGroups();
-            await integrationTestGroups.initializeTests(tester);
-            await integrationTestGroups.waitForUI(durationMultiple: 2); // Wait initial Load
-            await integrationTestGroups.testEndToEndUsing(TargetPlatform.android);
-            await integrationTestGroups.testEndToEndUsing(TargetPlatform.iOS);
-
-        }, timeout: const Timeout(Duration(minutes: 4)));
-
-    });
+      }, timeout: const Timeout(Duration(minutes: 3))
+    );
+    
 }

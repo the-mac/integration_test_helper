@@ -36,14 +36,7 @@ class _MyAppState extends State<MyApp> {
         create: (_) => DrawerManagerProvider(),
         child: PlatformApp(
             defaultPlatform: PlatformWidget.platform,
-            androidApp: MaterialApp(
-                home: const MyHomePage(),
-                builder: (context, child) {
-                  return CupertinoTheme(
-                    data: const CupertinoThemeData(),
-                    child: Material(child: child),
-                  );
-                }),
+            androidApp: const MaterialApp(home: MyHomePage()),
             iosApp: const CupertinoApp(
                 theme: CupertinoThemeData(brightness: Brightness.light),
                 home: MyHomePage(),

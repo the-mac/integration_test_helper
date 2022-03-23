@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 abstract class BaseIntegrationTest {
 
-    final int timeoutDuration = 350;
+    final int timeoutDuration = 750;
 
     late WidgetTester tester;
 
@@ -22,16 +22,20 @@ abstract class BaseIntegrationTest {
         return json.decode(source);
     }
 
-    Future<void> initializeTests(WidgetTester tester) async {
+    Future<void> initializeTests(WidgetTester tester, Widget main) async {
+
         this.tester = tester;
+        WidgetsApp.debugAllowBannerOverride = false;
+        await tester.pumpWidget(main);
+
         await setupInitialData();
+        await waitForUI(durationMultiple: 2);
+
     }
     
     Future<void> waitForUI({int durationMultiple = 1}) async {
         await tester.pumpAndSettle();
-        sleep(Duration(milliseconds: timeoutDuration * durationMultiple));
         await tester.pump(Duration(milliseconds: timeoutDuration * durationMultiple));
-        await Future.delayed(Duration(milliseconds: timeoutDuration * durationMultiple));
     }
 
     Future<bool> verifyExactText(String itemText, {bool shouldThrowError = true}) async {
@@ -122,51 +126,26 @@ abstract class BaseIntegrationTest {
   
     Future<void> tapBackArrow() async {
         await waitForUI();
-        if(await isPlatformAndroid()) {
-            final widgetFinder = find.byTooltip('Back');
-            await tester.tap(widgetFinder);
-        } else {
-            final widgetFinder = find.byType(CupertinoNavigationBarBackButton);
-            await tester.tap(widgetFinder);
-        }
+        await tester.pageBack();
         await waitForUI();
     }
-  
-    Future<void> tapBackKey() async {
-        if (await isPlatformAndroid()) {
-          await Process.run(
-            'pwd',
-            // 'input keyevent KEYCODE_BACK', 
-            <String>[],
-            runInShell: true,
-          );
-        }
+
+    Future<void> _tapKeyboardKey(LogicalKeyboardKey key) async {
+        await waitForUI();
+        final targetPlatform = await isPlatformAndroid() ? 'android' : 'ios';
+        await simulateKeyDownEvent(key, platform: targetPlatform);
     }
 
-    Future<void> tapEnterKey() async {
-        if (await isPlatformAndroid()) {
-            await Process.run(
-                'input', 
-                <String>['keyevent', 'KEYCODE_ENTER'],
-                runInShell: true,
-            );
-        } else {
-            await Process.run('input', <String>['keyevent', 'KEYCODE_ENTER']);
-        }
-    }
-  
-    Future<void> tapHomeKey() async {
-        if (await isPlatformAndroid()) {
-            await Process.run(
-                'input', 
-                <String>['keyevent', 'KEYCODE_HOME'],
-                runInShell: true,
-            );
-        } else {
-            await Process.run('input', <String>['keyevent', 'KEYCODE_HOME']);
-        }
-    }  
-  
+    Future<void> tapEnterKey() async  => await _tapKeyboardKey(LogicalKeyboardKey.enter);
+
+    Future<void> tapShiftKey() async  => await _tapKeyboardKey(LogicalKeyboardKey.shift);
+
+    Future<void> tapSpaceKey() async  => await _tapKeyboardKey(LogicalKeyboardKey.space);
+
+    Future<void> tapSearchKey() async  => await _tapKeyboardKey(LogicalKeyboardKey.browserSearch);
+
+    Future<void> tapDeleteKey() async  => await _tapKeyboardKey(LogicalKeyboardKey.delete); 
+    
     Future<void> tapDoneButton() async {
         await waitForUI();
         await tester.testTextInput.receiveAction(TextInputAction.done);
