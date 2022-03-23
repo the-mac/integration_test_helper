@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'platforms.dart';
+
 class CounterPage extends StatefulWidget {
   const CounterPage({Key? key}) : super(key: key);
 
@@ -69,6 +71,7 @@ class _CounterPageState extends State<CounterPage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+      bottomSheet: PlatformWidget.isAndroid ? null : const Padding(padding: EdgeInsets.only(bottom: 100.0)),
     );
   }
 }

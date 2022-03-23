@@ -13,6 +13,20 @@ abstract class BaseIntegrationTest {
 
     late WidgetTester tester;
 
+    Future<bool> isPlatformAndroid();
+
+    Future<void> setupInitialData();
+
+    Future<dynamic> loadFixtureJSON(String fixturePath) async {
+        final source =  await rootBundle.loadString(fixturePath);
+        return json.decode(source);
+    }
+
+    Future<void> initializeTests(WidgetTester tester) async {
+        this.tester = tester;
+        await setupInitialData();
+    }
+    
     Future<void> waitForUI({int durationMultiple = 1}) async {
         await tester.pumpAndSettle();
         sleep(Duration(milliseconds: timeoutDuration * durationMultiple));
@@ -20,18 +34,6 @@ abstract class BaseIntegrationTest {
         await Future.delayed(Duration(milliseconds: timeoutDuration * durationMultiple));
     }
 
-    Future<dynamic> loadFixture(String fixturePath) async {
-        final source =  await rootBundle.loadString(fixturePath);
-        return json.decode(source);
-    }
-
-    Future<void> setupInitialData();
-
-    Future<void> initializeTests(WidgetTester tester) async {
-        this.tester = tester;
-        await setupInitialData();
-    }
-    
     Future<bool> verifyExactText(String itemText, {bool shouldThrowError = true}) async {
         try {
             var outputTextWidget = find.text(itemText);
@@ -120,7 +122,7 @@ abstract class BaseIntegrationTest {
   
     Future<void> tapBackArrow() async {
         await waitForUI();
-        if(Platform.isAndroid) {
+        if(await isPlatformAndroid()) {
             final widgetFinder = find.byTooltip('Back');
             await tester.tap(widgetFinder);
         } else {
@@ -131,7 +133,7 @@ abstract class BaseIntegrationTest {
     }
   
     Future<void> tapBackKey() async {
-        if (Platform.isAndroid) {
+        if (await isPlatformAndroid()) {
           await Process.run(
             'pwd',
             // 'input keyevent KEYCODE_BACK', 
@@ -142,7 +144,7 @@ abstract class BaseIntegrationTest {
     }
 
     Future<void> tapEnterKey() async {
-        if (Platform.isAndroid) {
+        if (await isPlatformAndroid()) {
             await Process.run(
                 'input', 
                 <String>['keyevent', 'KEYCODE_ENTER'],
@@ -154,7 +156,7 @@ abstract class BaseIntegrationTest {
     }
   
     Future<void> tapHomeKey() async {
-        if (Platform.isAndroid) {
+        if (await isPlatformAndroid()) {
             await Process.run(
                 'input', 
                 <String>['keyevent', 'KEYCODE_HOME'],

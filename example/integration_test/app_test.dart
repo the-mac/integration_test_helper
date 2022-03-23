@@ -27,13 +27,10 @@ void main() async {
             integrationTestGroups = ScreenIntegrationTestGroups();
             await integrationTestGroups.initializeTests(tester);
             await integrationTestGroups.waitForUI(durationMultiple: 2); // Wait initial Load
-            await integrationTestGroups.testHelloFlutterFeature();
-            await integrationTestGroups.testLanguagesFeature();
-            await integrationTestGroups.testCounterFeature();
-            await integrationTestGroups.testSocialFeature();
-            await integrationTestGroups.testPreferencesFeature();
+            await integrationTestGroups.testEndToEndUsing(TargetPlatform.android);
+            await integrationTestGroups.testEndToEndUsing(TargetPlatform.iOS);
 
-        }, timeout: const Timeout(Duration(minutes: 3)));
+        }, timeout: const Timeout(Duration(minutes: 4)));
 
     });
 }

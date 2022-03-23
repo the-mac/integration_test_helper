@@ -1,5 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
+import 'package:example/platforms.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,25 +51,46 @@ class WebViewContainer extends StatelessWidget {
 
   const WebViewContainer(this.webViewUrl, {Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
 
+    return Container(
+        child: WebView(
+          initialUrl: webViewUrl,
+          javascriptMode: JavascriptMode.unrestricted,
+          onPageFinished: (url) {
+              print('url: $url');
+              launchResults[url] = true;
+          },
+          debuggingEnabled: false,
+        ),
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.blue)
+        )
+    );
+  }
+
+  Widget _buildAndroid(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(
-          child: WebView(
-            initialUrl: webViewUrl,
-            javascriptMode: JavascriptMode.unrestricted,
-            onPageFinished: (url) {
-                print('url: $url');
-                launchResults[url] = true;
-            },
-            debuggingEnabled: false,
-          ),
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue)
-          ),
-      ),
+      body: _buildBody(context)
+    );
+  }
+
+  Widget _buildIOS(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(),
+      child: SafeArea(
+        child: _buildBody(context)
+      )
+    );
+  }
+
+
+  @override
+  Widget build(context) {
+    return PlatformWidget(
+      androidBuilder: _buildAndroid,
+      iosBuilder: _buildIOS,
     );
   }
 }
@@ -103,12 +128,12 @@ class TheMACPage extends StatelessWidget {
             height: 250,
           ),
           SocialButton(
-            'Share Integration Test Helper',
+            'View Integration Test Helper',
             const Color(0xff0085E0),
             Icons.share,
             onTap: () {
                 Navigator.push<void>(
-                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(shareURL))
+                  context, MaterialPageRoute( builder: (BuildContext context) => const WebViewContainer(shareURL))
                 );
             }
           ),
@@ -118,7 +143,7 @@ class TheMACPage extends StatelessWidget {
             FontAwesomeIcons.facebookF,
             onTap: () async {
                 Navigator.push<void>(
-                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(facebookURL))
+                  context, MaterialPageRoute( builder: (BuildContext context) => const WebViewContainer(facebookURL))
                 );
             }
           ),
@@ -128,7 +153,7 @@ class TheMACPage extends StatelessWidget {
             FontAwesomeIcons.github,
             onTap: () async {
                 Navigator.push<void>(
-                  context, MaterialPageRoute( builder: (BuildContext context) => WebViewContainer(githubURL))
+                  context, MaterialPageRoute( builder: (BuildContext context) => const WebViewContainer(githubURL))
                 );
             }
           ),

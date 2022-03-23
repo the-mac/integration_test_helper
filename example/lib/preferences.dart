@@ -1,3 +1,4 @@
+import 'package:example/platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -9,7 +10,7 @@ class Prefs {
   static late SharedPreferences _prefs;
 
   // call this method from iniState() function of mainApp().
-  static Future<void> initialize() async {
+  static void initialize() async {
     _prefs = await SharedPreferences.getInstance();
     preferenceResults = {
       'preference-0': _prefs.getBool('preference-0') ?? false,
@@ -42,16 +43,13 @@ class Prefs {
 
 class PreferencesPage extends StatefulWidget {
 
-  PreferencesPage() : super(key: stateKey) {
-    Prefs.initialize();
-  }
+  PreferencesPage() : super(key: stateKey);
 
   @override
-  _PreferencesPageState createState() => _PreferencesPageState();
+  State<PreferencesPage> createState() => _PreferencesPageState();
 }
 
 class _PreferencesPageState extends State<PreferencesPage> {
-  
   Widget _buildListTile(int position, String title) {
       final prefKey = 'preference-$position';
       return ListTile(
@@ -63,22 +61,22 @@ class _PreferencesPageState extends State<PreferencesPage> {
           ),
       );
   }
-  
+
   Widget _buildList() {
-    return ListView(
-      children: [
-        const Padding(padding: EdgeInsets.only(top: 24)),
-        _buildListTile(0, 'Notifications for new packages'),
-        _buildListTile(1, 'Github Pull Requests updates'),
-        _buildListTile(2, 'Send Mobile Community updates'),
-        _buildListTile(3, 'Github - Flutter Community updates'),
-        _buildListTile(4, 'Github - Android Community updates'),
-        _buildListTile(5, 'Github - iOS Community updates'),
-        _buildListTile(6, 'Github - Django Community updates')
-      ],
-    );
+    return Scaffold(
+        body: ListView(
+        children: [
+          const Padding(padding: EdgeInsets.only(top: 24)),
+          _buildListTile(0, 'Notifications for new packages'),
+          _buildListTile(1, 'Github Pull Requests updates'),
+          _buildListTile(2, 'Send Mobile Community updates'),
+          _buildListTile(3, 'Github - Flutter Community updates'),
+          _buildListTile(4, 'Github - Android Community updates'),
+          _buildListTile(5, 'Github - iOS Community updates'),
+          _buildListTile(6, 'Github - Django Community updates')
+        ],
+    ));
   }
 
   @override Widget build(context) => _buildList();
-
 }

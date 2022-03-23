@@ -1,37 +1,47 @@
+import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:example/platforms.dart';
 
-class LanguagesPage extends StatelessWidget {
-  late List languages;
+class LanguagesPage extends StatefulWidget {
 
-  LanguagesPage({Key? key}) : super(key: key) {
+  const LanguagesPage({Key? key}) : super(key: key);
+  @override State<LanguagesPage> createState() => _LanguagesPageState();
+
+}
+
+class _LanguagesPageState extends State<LanguagesPage> {
+  late List languages = [];
+
+  _LanguagesPageState() : super() {
     _loadLanguages();
   }
 
   void _loadLanguages() async {
-    final source =
-        await rootBundle.loadString('assets/fixtures/languages.json');
+    final source = await rootBundle.loadString('assets/fixtures/languages.json');
     languages = json.decode(source)['results'];
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: Scaffold(
         body: ListView.builder(
       key: const Key('item_list'),
       itemCount: languages.length,
       padding: const EdgeInsets.symmetric(vertical: 12),
       itemBuilder: _listBuilder,
-    ));
+    )));
   }
 
   Widget _listBuilder(BuildContext context, int index) {
     final item = languages[index];
-    return SafeArea(
-      top: false,
-      bottom: false,
-      child: Card(
+    return Card(
         elevation: 1.5,
         margin: const EdgeInsets.fromLTRB(6, 12, 6, 0),
         shape: RoundedRectangleBorder(
@@ -41,14 +51,16 @@ class LanguagesPage extends StatelessWidget {
         child: InkWell(
             key: Key('item_$index'),
             onTap: () {
-              Navigator.push<void>(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          LanguagePage(index: index, language: item)));
+              if(Platform.isAndroid) {
+                  final route = MaterialPageRoute(builder: (BuildContext context) => LanguagePage(index: index, language: item));
+                  Navigator.push<void>(context, route);
+              } else {
+                  final route = CupertinoPageRoute(builder: (BuildContext context) => LanguagePage(index: index, language: item));
+                  Navigator.push<void>(context, route);
+              }
             },
             child: LanguagePreview(index: index, language: item)),
-      ),
+      
     );
   }
 }
@@ -175,11 +187,10 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguagePageState extends State<LanguagePage> {
-  @override
-  Widget build(context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: SingleChildScrollView(
+
+
+  Widget _buildBody(BuildContext context) {
+      return SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
             children: [
@@ -187,7 +198,31 @@ class _LanguagePageState extends State<LanguagePage> {
               LanguageDetail(index: widget.index, language: widget.language),
             ],
           ),
-      ),
+      );
+  }
+
+  Widget _buildIOS(BuildContext context) {
+    return CupertinoPageScaffold(
+      navigationBar: const CupertinoNavigationBar(),
+      child: SafeArea(
+        child: _buildBody(context)
+      )
+    );
+  }
+
+  Widget _buildAndroid(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: _buildBody(context)
+    );
+  }
+
+
+  @override
+  Widget build(context) {
+    return PlatformWidget(
+      androidBuilder: _buildAndroid,
+      iosBuilder: _buildIOS,
     );
   }
 }

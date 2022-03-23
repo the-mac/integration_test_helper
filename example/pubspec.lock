@@ -70,7 +70,7 @@ packages:
       name: drawer_manager
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.0.3"
+    version: "0.0.4"
   fake_async:
     dependency: transitive
     description:
@@ -137,7 +137,7 @@ packages:
     source: sdk
     version: "0.0.0"
   integration_test_helper:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       path: ".."
       relative: true

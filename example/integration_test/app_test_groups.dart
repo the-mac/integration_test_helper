@@ -1,7 +1,7 @@
 
 // ignore_for_file: avoid_print
-
-import 'dart:io';
+import 'package:example/platforms.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test_helper/integration_test_helper.dart';
 
@@ -12,14 +12,30 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
     late Map _languagesTestData;
 
+    @override Future<bool> isPlatformAndroid() => Future.value(PlatformWidget.isAndroid);
+
     @override
     Future<void> setupInitialData() async {
 
-        _languagesTestData = await loadFixture('assets/fixtures/languages.json') as Map;
+        _languagesTestData = await loadFixtureJSON('assets/fixtures/languages.json') as Map;
 
         if (_languagesTestData.isEmpty) {
             throw 'No languages test data found';
         }
+
+    }
+
+    Future<void> testEndToEndUsing(TargetPlatform platform) async {
+        
+        PlatformWidget.setPlatform(platform);
+        PlatformWidget.reassembleApplication();
+        await waitForUI(durationMultiple: 2);
+
+        await testHelloFlutterFeature();
+        await testLanguagesFeature();
+        await testCounterFeature();
+        await testSocialFeature();
+        await testPreferencesFeature();
 
     }
 
@@ -29,9 +45,16 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         await verifyListExactText(itemIndex, widgetPrefix: 'item', widgetSuffix: widgetSuffix, expectedText: itemText);
     }
 
+    Future<void> verifyAppBarText(String appBarText) async {
+        if(PlatformWidget.isAndroid) {
+            await verifyTextForKey('app-bar-text', appBarText);
+        }
+        await waitForUI();
+    }
+
     Future<void> showHelloFlutter() async {
         print('Showing Hello, Flutter!');
-        if(Platform.isAndroid) {
+        if(PlatformWidget.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-hello');
         } else {
@@ -42,29 +65,29 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
     Future<void> showLanguagesList() async {
         print('Showing Languages');
-        if(Platform.isAndroid) {
+        if(PlatformWidget.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-languages');
         } else {
-            await tapWidget('Items');
+            await tapWidget('Languages');
         }
         await waitForUI();
     }
 
     Future<void> showCounterSample() async {
         print('Showing Counter Sample');
-        if(Platform.isAndroid) {
+        if(PlatformWidget.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-counter');
         } else {
-            await tapWidget('Counter');
+            await tapWidget('Counter Sample');
         }
         await waitForUI();
     }
 
     Future<void> showTheMACSocials() async {
         print('Showing Mobile Community');
-        if(Platform.isAndroid) {
+        if(PlatformWidget.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-community');
         } else {
@@ -75,7 +98,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
     Future<void> showPreferences() async {
         print('Showing Preferences');
-        if(Platform.isAndroid) {
+        if(PlatformWidget.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-preferences');
         } else {
@@ -90,7 +113,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
     Future<void> testHelloFlutterFeature() async {
         await showHelloFlutter();
-        await verifyTextForKey('app-bar-text', 'Hello');
+        await verifyAppBarText('Hello');
         await verifyTextForKey('hello-page-text', 'Hello, Flutter!');
     }
 
@@ -98,7 +121,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         
         // VIEW LANGUAGES PAGE
         await showLanguagesList();
-        await verifyTextForKey('app-bar-text', 'Languages');
+        await verifyAppBarText('Languages');
 
         await validateTestDataAt(0, widgetSuffix: 'name', jsonKey: 'name');
         await validateTestDataAt(1, widgetSuffix: 'name', jsonKey: 'name');
@@ -118,7 +141,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
     Future<void> testCounterFeature() async {
 
         await showCounterSample();
-        await verifyTextForKey('app-bar-text', 'Counter Sample');
+        await verifyAppBarText('Counter Sample');
 
         await verifyTextForKey('counter-page-text', '0');
         await tapForTooltip('Increment');
@@ -139,11 +162,11 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
     Future<void> testSocialFeature() async {
 
         await showTheMACSocials();
-        await verifyTextForKey('app-bar-text', 'Mobile Community');
+        await verifyAppBarText('Mobile Community');
         await verifyExactText('Welcome to\nThe Mobile Apps Community!');
 
-        await verifyExactText('Share Integration Test Helper');
-        await tapWidget('Share Integration Test Helper');
+        await verifyExactText('View Integration Test Helper');
+        await tapWidget('View Integration Test Helper');
         await waitForUI(durationMultiple: 2);
         await tapBackArrow();
 
@@ -175,7 +198,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
         // SHOW SETTINGS PAGE
         await showPreferences();
-        await verifyTextForKey('app-bar-text', 'Preferences');
+        await verifyAppBarText('Preferences');
         
         await verifyExactText('Notifications for new packages');
         assert(!Prefs.getBool('preference-0'));
