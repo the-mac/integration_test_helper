@@ -287,17 +287,19 @@ Future<void> main() => integrationDriver();
 import 'package:flutter/material.dart';
 
 class HelloPage extends StatelessWidget {
+
+  final int position;
   
-  const HelloPage({Key? key}) : super(key: key);
+  const HelloPage({Key? key, required this.position}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Text(
-        'Hello, Flutter!',
-        key: Key('hello-page-text'),
+        'Hello, Flutter $position!',
+        key: Key('hello-page-text-$position'),
         textAlign: TextAlign.center,
-        style: TextStyle(
+        style: const TextStyle(
             color: Color(0xff0085E0),
             fontSize: 48,
             fontWeight: FontWeight.bold
@@ -311,16 +313,10 @@ class HelloPage extends StatelessWidget {
 
 ### Create main file (lib/main.dart)
 
-If testing on an Android device/emulator the PlatformWidget allows for native Android interactions 
-with the Drawer Manager. If testing on an iOS device/simulator the PlatformWidget allows for native iOS
-interations with the TabBar.
-
 ```dart
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:drawer_manager/drawer_manager.dart';
 
 import 'hello.dart';
@@ -364,7 +360,7 @@ class MyHomePage extends StatelessWidget {
   Widget _getTitleWidget() {
     return Consumer<DrawerManagerProvider>(builder: (context, dmObj, _) {
       return Text(
-        _getTitle(dmObj.drawer),
+        _getTitle(dmObj.selection),
         key: const Key('app-bar-text')
       );
     });
@@ -418,7 +414,7 @@ class MyHomePage extends StatelessWidget {
           ],
           tileSelections: drawerSelections,
         ));
-  }
+    }
 
 }
 
@@ -435,8 +431,7 @@ import 'package:integration_test_helper/integration_test_helper.dart';
 ### Subclass BaseIntegrationTest (in integration_test/app_test_groups.dart)
 
 The Integration Test Helper can support platform specific implementations, like the showHelloFlutter
-method. This method uses the Drawer for Android and the Tab Bar for iOS, and accomodates the different
-implmentations.
+method. This method uses the Drawer for Android and accomodates the Android environment.
 
 ```dart
 
@@ -454,8 +449,8 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         // ...
     }
 
-    Future<void> showHelloFlutter({required int position = 2}) async {
-        print('Showing Hello, Flutter!');
+    Future<void> showHelloFlutter({required int position}) async {
+        print('Showing Hello, Flutter $position!');
         if(Platform.isAndroid) {
             await tapForTooltip('Open navigation menu');
             await tapForKey('drawer-hello-$position');
@@ -466,18 +461,20 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
     Future<void> testHelloFlutterFeature() async {
         await showHelloFlutter(position: 1);
         await verifyTextForKey('app-bar-text', 'Hello 1');
-        await verifyTextForKey('hello-page-text-1', 'Hello, Flutter!');
+        await verifyTextForKey('hello-page-text-1', 'Hello, Flutter 1!');
 
         await showHelloFlutter(position: 2);
         await verifyTextForKey('app-bar-text', 'Hello 2');
-        await verifyTextForKey('hello-page-text-2', 'Hello, Flutter!');
+        await verifyTextForKey('hello-page-text-2', 'Hello, Flutter 2!');
+    }
 
     // ...
 
 }
+
 ```
 
-### Setp BaseIntegrationTest Subclass (in integration_test/app_test.dart)
+### Setup BaseIntegrationTest Subclass (in integration_test/app_test.dart)
 ```dart
 
 import 'package:flutter/material.dart';
@@ -514,4 +511,14 @@ void main() async {
 
 ## Additional information
 
+### Alternatively, you can run the example
+The [example project](https://github.com/the-mac/integration_test_helper/tree/main/example) has 5 screens that have grouped integration tests:
+
+- [Hello, Flutter](https://github.com/the-mac/integration_test_helper/blob/707c6a797b28a6275b50ed6624b10cc9b79e8b4a/example/integration_test/app_test_groups.dart#L114)
+- [Hello, Languages](https://github.com/the-mac/integration_test_helper/blob/707c6a797b28a6275b50ed6624b10cc9b79e8b4a/example/integration_test/app_test_groups.dart#L120)
+- [Counter Sample](https://github.com/the-mac/integration_test_helper/blob/707c6a797b28a6275b50ed6624b10cc9b79e8b4a/example/integration_test/app_test_groups.dart#L141)
+- [Mobile Community](https://github.com/the-mac/integration_test_helper/blob/707c6a797b28a6275b50ed6624b10cc9b79e8b4a/example/integration_test/app_test_groups.dart#L162)
+- [Preferences](https://github.com/the-mac/integration_test_helper/blob/707c6a797b28a6275b50ed6624b10cc9b79e8b4a/example/integration_test/app_test_groups.dart#L197)
+
+### Package Documentation
 To view the documentation on the package, [follow this link](https://pub.dev/documentation/integration_test_helper/latest/integration_test_helper/integration_test_helper-library.html)
