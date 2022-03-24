@@ -23,7 +23,18 @@ The Integration Test Helper is built on top of [Flutter's Integration Tests](htt
 
 [![Regression Testing](https://raw.githubusercontent.com/the-mac/integration_test_helper/main/media/integration_test_4.png)](https://youtu.be/0wHKVXbsppw)
 
-Integration Test Helper (or the BaseIntegrationTest class) allows for [BlackBox Testing](https://www.guru99.com/black-box-testing.html) using fixture data. The fixtures currently support JSON data, and can be loaded from anywhere within the project folder. Here is what the fixture test data (assets/fixtures/languages.json) looks like that is being blackbox tested...
+Integration Test Helper (or the BaseIntegrationTest class) allows for [BlackBox Testing](https://www.guru99.com/black-box-testing.html) using fixture data. The fixture data can be loaded using the loadFixtureJSON method, which is implemented like the following:
+
+```dart
+
+    Future<dynamic> loadFixtureJSON(String fixturePath) async {
+        final source =  await rootBundle.loadString(fixturePath);
+        return json.decode(source);
+    }
+
+```
+
+The fixtures currently support JSON data, and can be loaded from anywhere within the project folder. Here is what the fixture test data (assets/fixtures/languages.json) looks like that is being blackbox tested...
 
 ```json
 {
@@ -48,7 +59,64 @@ Integration Test Helper (or the BaseIntegrationTest class) allows for [BlackBox 
 }
 ```
 
-This data is typically initialized in the setupInitialData implementation of the BaseIntegrationTest subclass. The following is an example of how you can BlackBox Test your ListViews, as well other types of Widgets with Integration Test Helper:
+This data is typically initialized in the setupInitialData implementation of the BaseIntegrationTest subclass. With the user/dev defined implementation of the validateTestDataAt (or similar method), we can access the initial data for BlackBox testing and call to the verifyListExactText method with this position based data. 
+
+```dart
+
+    Future<void> validateTestDataAt(int itemIndex, { required String widgetSuffix, required String jsonKey }) async {
+        var languageData = _languagesTestData['results'][itemIndex] as Map;
+        var itemText = languageData[jsonKey] as String;
+        await verifyListExactText(itemIndex, widgetPrefix: 'item', widgetSuffix: widgetSuffix, expectedText: itemText);
+    }
+
+```
+
+The verifyListExactText is implemented so that a child widget of the List Item can be accessed using the ${widgetPrefix}_${itemIndex}_$widgetSuffix components, where the widgetSuffix is the desciptor for the Item's child widget.
+
+```dart
+
+    Future<void> verifyListExactText(int itemIndex, { required String widgetPrefix, required String widgetSuffix, required String expectedText }) async {
+
+        final widgetKey = '${widgetPrefix}_${itemIndex}_$widgetSuffix';
+
+        final itemWidgetFinder = find.byKey(ValueKey(widgetKey));
+        expect(itemWidgetFinder, findsOneWidget);
+
+        final actualWidget = itemWidgetFinder.evaluate().single.widget as Text;
+
+        final actualText = actualWidget.data!;
+        expect(actualText, expectedText);
+
+        await waitForUI();
+    }
+
+```
+
+
+Here is an example of how a Widget like that would be written:
+
+```dart
+
+        Text(
+            name,
+            key: Key('item_${index}_name'),
+            style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+            ),
+        ),
+
+```
+
+And here is an example of that widget being tested against:
+
+```dart
+
+        await validateTestDataAt(0, widgetSuffix: 'name', jsonKey: 'name');
+
+```
+
+The following is a more complete example of how you can BlackBox Test your ListViews, as well other types of Widgets with Integration Test Helper:
 
 ```dart
 
@@ -165,7 +233,7 @@ And here is an example of using that Key to tap the list item widget:
 ## Getting started
 
 Note: this package example uses another one of our packages. It's called the drawer_manager 
-package, and can be found [here](https://pub.dev/packages/drawer_manager) for more details on how it works.
+pacakge, and can be found [here](https://pub.dev/packages/drawer_manager) for more details on how it works.
 
 ### Install Provider, Drawer Manager & Integration Test Helper
 ```bash
@@ -220,14 +288,14 @@ import 'package:flutter/material.dart';
 
 class HelloPage extends StatelessWidget {
   
-  const HelloPage({Key? key, required int position}) : super(key: key);
+  const HelloPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
         'Hello, Flutter!',
-        key: Key('hello-page-text-$position'),
+        key: Key('hello-page-text'),
         textAlign: TextAlign.center,
         style: TextStyle(
             color: Color(0xff0085E0),
@@ -281,7 +349,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
 
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -350,7 +418,7 @@ class MyHomePage extends StatefulWidget {
           ],
           tileSelections: drawerSelections,
         ));
-    }
+  }
 
 }
 
@@ -403,7 +471,6 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         await showHelloFlutter(position: 2);
         await verifyTextForKey('app-bar-text', 'Hello 2');
         await verifyTextForKey('hello-page-text-2', 'Hello, Flutter!');
-    }
 
     // ...
 
@@ -422,11 +489,11 @@ import 'app_test_groups.dart';
 
 void main() async {
 
-    IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+    IntegrationTestWidgetsFlutterBinding.ensureInitialized();    
 
     testWidgets('Testing end to end single-screen integration', (WidgetTester tester) async {
       
-          final main = app.setupMainWidget();
+          final main = app.setupMainWidget();            
           final integrationTestGroups = ScreenIntegrationTestGroups();
           await integrationTestGroups.initializeTests(tester, main);
 
@@ -446,8 +513,5 @@ void main() async {
 ```
 
 ## Additional information
-
-
-To support this repo, take a look at the [SUPPORT.md](https://github.com/the-mac/integration_test_helper/blob/main/SUPPORT.md) file.
 
 To view the documentation on the package, [follow this link](https://pub.dev/documentation/integration_test_helper/latest/integration_test_helper/integration_test_helper-library.html)
