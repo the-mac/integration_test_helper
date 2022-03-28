@@ -188,7 +188,7 @@ dependencies:
     ...
 
   provider: 6.0.2
-  drawer_manager: 0.0.3
+  drawer_manager: 0.0.4
     
 dev_dependencies:
 
@@ -202,7 +202,7 @@ dev_dependencies:
 
 ```
 
-### Add Integration Test Driver file (test_driver/integration_test.dart)
+### Add Integration Test Driver file (test_driver/app_features_test.dart)
 ```dart
 
 import 'package:integration_test/integration_test_driver.dart';
@@ -361,7 +361,7 @@ import 'package:integration_test_helper/integration_test_helper.dart';
 
 ```
 
-### Subclass BaseIntegrationTest (in integration_test/app_test_groups.dart)
+### Subclass BaseIntegrationTest (in integration_test/app_feature_groups.dart)
 
 The Integration Test Helper can support platform specific implementations, like the showHelloFlutter
 method. This method uses the Drawer for Android and accomodates the Android environment.
@@ -407,14 +407,14 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
 ```
 
-### Setup BaseIntegrationTest Subclass (in integration_test/app_test.dart)
+### Setup BaseIntegrationTest Subclass (in integration_test/app_features.dart)
 ```dart
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'package:example/main.dart' as app;
-import 'app_test_groups.dart';
+import 'app_feature_groups.dart';
 
 void main() async {
 
@@ -435,10 +435,10 @@ void main() async {
 
 ```
 
-### Run Driver on BaseIntegrationTest Subclass (using integration_test/app_test.dart)
+### Run Driver on BaseIntegrationTest Subclass (using integration_test/app_features.dart)
 ```bash
 
-    flutter drive --driver=test_driver/integration_test.dart --target=integration_test/app_test.dart
+    flutter drive -t integration_test/app_features.dart
 
 ```
 

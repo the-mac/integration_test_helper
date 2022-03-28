@@ -12,6 +12,8 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
     late Map _languagesTestData;
 
+    ScreenIntegrationTestGroups(binding) : super(binding);
+
     @override Future<bool> isPlatformAndroid() => Future.value(PlatformWidget.isAndroid);
 
     @override
@@ -111,10 +113,20 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
       await tapForKey('preference-$number');
     }
 
+    Future<void> setupScreenshot(String fileName) async {
+        await waitForUI(durationMultiple: 3);
+        String platformType = PlatformWidget.isAndroid ? 'android' : 'ios';
+        String screenshotPath = 'screenshots/$platformType/$fileName.png';
+        print('Setting up screenshot: $screenshotPath');
+        await takeScreenshot(screenshotPath);
+        await waitForUI(durationMultiple: 3);
+    }
+
     Future<void> testHelloFlutterFeature() async {
         await showHelloFlutter();
         await verifyAppBarText('Hello');
         await verifyTextForKey('hello-page-text', 'Hello, Flutter!');
+        await setupScreenshot('hello_flutter');
     }
 
     Future<void> testLanguagesFeature() async {
@@ -122,6 +134,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         // VIEW LANGUAGES PAGE
         await showLanguagesList();
         await verifyAppBarText('Languages');
+        await setupScreenshot('languages_list');
 
         await validateTestDataAt(0, widgetSuffix: 'name', jsonKey: 'name');
         await validateTestDataAt(1, widgetSuffix: 'name', jsonKey: 'name');
@@ -129,6 +142,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         // VIEW LANGUAGE PAGE
         await tapListItem(widgetPrefix: 'item', itemIndex: 0);
         await verifyExactText('Python');
+        await setupScreenshot('language_python');
         await tapBackArrow();
 
         // VIEW LANGUAGE PAGE
@@ -142,6 +156,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
         await showCounterSample();
         await verifyAppBarText('Counter Sample');
+        await setupScreenshot('counter_sample_0');
 
         await verifyTextForKey('counter-page-text', '0');
         await tapForTooltip('Increment');
@@ -156,6 +171,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         await tapForTooltip('Increment');
 
         await verifyTextForKey('counter-page-text', '4');
+        await setupScreenshot('counter_sample_4');
 
     }
 
@@ -164,33 +180,38 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         await showTheMACSocials();
         await verifyAppBarText('Mobile Community');
         await verifyExactText('Welcome to\nThe Mobile Apps Community!');
+        await setupScreenshot('mobile_community');
 
         await verifyExactText('View Integration Test Helper');
         await tapWidget('View Integration Test Helper');
-        await waitForUI(durationMultiple: 2);
-        await tapBackArrow();
+        await waitForUI(durationMultiple: 6);
 
         final launchResultsHasShareURL = launchResults.containsKey(TheMACPage.shareURL);
         final pubDevLaunchSuccessful = launchResultsHasShareURL && launchResults[TheMACPage.shareURL];
         assert(pubDevLaunchSuccessful);
+        await tapBackArrow();
 
         await verifyExactText('Check out our Facebook');
         await tapWidget('Check out our Facebook');
-        await waitForUI(durationMultiple: 2);
-        await tapBackArrow();
+        await waitForUI(durationMultiple: 6);
 
         final launchResultsHasFacebookURL = launchResults.containsKey(TheMACPage.facebookURL);
         final facebookLaunchSuccessful = launchResultsHasFacebookURL && launchResults[TheMACPage.facebookURL];
         assert(facebookLaunchSuccessful);
+        
+        await setupScreenshot('mobile_community_facebook');
+        await tapBackArrow();
 
         await verifyExactText('Check out our Github');
         await tapWidget('Check out our Github');
-        await waitForUI(durationMultiple: 2);
-        await tapBackArrow();
+        await waitForUI(durationMultiple: 6);
 
         final launchResultsHasGithubURL = launchResults.containsKey(TheMACPage.githubURL);
         final githubLaunchSuccessful = launchResultsHasGithubURL && launchResults[TheMACPage.githubURL];
         assert(githubLaunchSuccessful);
+
+        await setupScreenshot('mobile_community_github');
+        await tapBackArrow();
 
     }
 
@@ -199,6 +220,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
         // SHOW SETTINGS PAGE
         await showPreferences();
         await verifyAppBarText('Preferences');
+        await setupScreenshot('preferences_start');
         
         await verifyExactText('Notifications for new packages');
         assert(!Prefs.getBool('preference-0'));
@@ -226,6 +248,7 @@ class ScreenIntegrationTestGroups extends BaseIntegrationTest {
 
         await tapPreference(2);
         assert(!Prefs.getBool('preference-2'));
+        await setupScreenshot('preferences_end');
 
     }
 

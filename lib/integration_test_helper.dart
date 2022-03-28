@@ -1,17 +1,53 @@
 library integration_test_helper;
 
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+
+class IntegrationTestHelperBinding extends IntegrationTestWidgetsFlutterBinding {
+  
+  /// Similar to [WidgetsFlutterBinding.ensureInitialized].
+  ///
+  /// Returns an instance of the [IntegrationTestWidgetsFlutterBinding], creating and
+  /// initializing it if necessary.
+  static WidgetsBinding ensureInitialized() {
+    if (WidgetsBinding.instance == null) {
+      IntegrationTestHelperBinding();
+    }
+    assert(WidgetsBinding.instance is IntegrationTestHelperBinding);
+    return WidgetsBinding.instance!;
+  }
+
+  @override
+  Future<void> convertFlutterSurfaceToImage() async {
+    try {
+      await super.convertFlutterSurfaceToImage();
+    } on AssertionError catch (_) {}
+  }
+
+  /// Takes a screenshot.
+  ///
+  /// On Android, you need to call `convertFlutterSurfaceToImage()`, and
+  /// pump a frame before taking a screenshot.
+  @override
+  Future<List<int>> takeScreenshot(String screenshotName) async {
+    await convertFlutterSurfaceToImage();
+    return super.takeScreenshot(screenshotName);
+  }
+
+}
 
 abstract class BaseIntegrationTest {
 
     final int timeoutDuration = 750;
 
     late WidgetTester tester;
+
+    final IntegrationTestHelperBinding binding;
+
+    BaseIntegrationTest(this.binding);
 
     Future<bool> isPlatformAndroid();
 
@@ -185,6 +221,11 @@ abstract class BaseIntegrationTest {
         );
         await tester.pump();
         
+    }
+
+    Future<void> takeScreenshot(String filePath) async {      
+        await waitForUI();
+        binding.takeScreenshot(filePath);
     }
 
     Future<void> dismissModal() async {

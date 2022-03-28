@@ -256,7 +256,7 @@ dependencies:
     ...
 
   provider: 6.0.2
-  drawer_manager: 0.0.3
+  drawer_manager: 0.0.4
     
 dev_dependencies:
 
