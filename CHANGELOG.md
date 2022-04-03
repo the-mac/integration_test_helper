@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Fix for "'CupertinoTextField' is not a subtype of type 'TextField'"
+
 ## 0.0.4
 
 * Upgrade of Drawer Manager (0.0.4)

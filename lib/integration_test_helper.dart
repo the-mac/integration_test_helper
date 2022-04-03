@@ -1,6 +1,7 @@
 library integration_test_helper;
 
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -132,8 +133,13 @@ abstract class BaseIntegrationTest {
         final userText = find.byKey(Key(fieldKey));
         expect(userText, findsOneWidget);
 
-        final textField = tester.firstWidget(userText) as TextField;
-        textField.controller?.text = inputText;
+        if(tester.firstWidget(userText) is TextField) {
+            final textField = tester.firstWidget(userText) as TextField;
+            textField.controller?.text = inputText;
+        } else if(tester.firstWidget(userText) is CupertinoTextField) {
+            final textField = tester.firstWidget(userText) as CupertinoTextField;
+            textField.controller?.text = inputText;
+        }
     }
     
     Future<void> tapForKey(String fieldKey) async {        
