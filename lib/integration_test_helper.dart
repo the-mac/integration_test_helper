@@ -109,8 +109,13 @@ abstract class BaseIntegrationTest {
         final widgetFinder = find.byKey(Key(fieldKey));
         expect(widgetFinder, findsOneWidget);
 
-        final textField = widgetFinder.evaluate().single.widget as TextField;
-        expect(textField.controller!.text, itemText);
+        final firstWidget = widgetFinder.evaluate().single.widget;
+
+        if(firstWidget is TextField) {
+            expect(firstWidget.controller!.text, itemText);
+        } else if(firstWidget is CupertinoTextField) {
+            expect(firstWidget.controller!.text, itemText);
+        }
     }
 
     Future<void> verifyListExactText(int itemIndex, { required String widgetPrefix, required String widgetSuffix, required String expectedText }) async {
