@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Fix for verifyTextFieldForKey
+
 ## 0.0.5
 
 * Fix for "'CupertinoTextField' is not a subtype of type 'TextField'"
