@@ -42,7 +42,7 @@ class IntegrationTestHelperBinding extends IntegrationTestWidgetsFlutterBinding 
 
 abstract class BaseIntegrationTest {
 
-    final int timeoutDuration = 750;
+    late int waitForMilliseconds;
 
     late WidgetTester tester;
 
@@ -59,9 +59,10 @@ abstract class BaseIntegrationTest {
         return json.decode(source);
     }
 
-    Future<void> initializeTests(WidgetTester tester, Widget main) async {
+    Future<void> initializeTests(WidgetTester tester, Widget main, {int waitForMilliseconds = 750}) async {
 
         this.tester = tester;
+        this.waitForMilliseconds = waitForMilliseconds;
         WidgetsApp.debugAllowBannerOverride = false;
         await tester.pumpWidget(main);
 
@@ -72,7 +73,7 @@ abstract class BaseIntegrationTest {
     
     Future<void> waitForUI({int durationMultiple = 1}) async {
         await tester.pumpAndSettle();
-        await tester.pump(Duration(milliseconds: timeoutDuration * durationMultiple));
+        await tester.pump(Duration(milliseconds: waitForMilliseconds * durationMultiple));
     }
 
     Future<bool> verifyExactText(String itemText, {bool shouldThrowError = true}) async {
@@ -234,9 +235,10 @@ abstract class BaseIntegrationTest {
         
     }
 
-    Future<void> takeScreenshot(String filePath) async {      
+    Future<void> takeScreenshot(String filePath) async {  
         await waitForUI();
         binding.takeScreenshot(filePath);
+        await waitForUI();
     }
 
     Future<void> dismissModal() async {

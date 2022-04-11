@@ -198,7 +198,7 @@ dev_dependencies:
   integration_test:
     sdk: flutter
 
-  integration_test_helper: 0.0.1
+  integration_test_helper: <latest_version>
 
 ```
 

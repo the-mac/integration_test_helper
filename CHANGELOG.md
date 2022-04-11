@@ -1,3 +1,8 @@
+## 0.0.7
+
+* Adding waitForUI call after binding.takeScreenshot
+* Adding default waitForMilliseconds = 750 to initializeTests arguments
+
 ## 0.0.6
 
 * Fix for verifyTextFieldForKey
