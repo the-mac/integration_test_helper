@@ -1,48 +1,44 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PlatformApp extends PlatformWidget {
-
   PlatformApp({
     Key? key,
     required MaterialApp androidApp,
     required CupertinoApp iosApp,
     required TargetPlatform defaultPlatform,
-  }) : super(key: key,
-      androidBuilder: (BuildContext context) => androidApp,
-      iosBuilder:  (BuildContext context) => iosApp
-    ) {
-      PlatformWidget.setPlatform(defaultPlatform);
+  }) : super(
+            key: key,
+            androidBuilder: (BuildContext context) => androidApp,
+            iosBuilder: (BuildContext context) => iosApp) {
+    PlatformWidget.setPlatform(defaultPlatform);
   }
-
 }
 
 class PlatformWidget extends StatefulWidget {
-  
   static TargetPlatform? _defaultPlatform;
 
   static get platform {
-      if(_defaultPlatform == null) {
-        return TargetPlatform.android;
-      }
-      return _defaultPlatform;
+    if (_defaultPlatform == null) {
+      return TargetPlatform.android;
+    }
+    return _defaultPlatform;
   }
 
   static get isAndroid {
-      return _defaultPlatform == TargetPlatform.android;
+    return _defaultPlatform == TargetPlatform.android;
   }
 
   static get isIOS {
-      return _defaultPlatform == TargetPlatform.iOS;
+    return _defaultPlatform == TargetPlatform.iOS;
   }
 
   static void setPlatform(TargetPlatform platform) {
-      _defaultPlatform = platform;
+    _defaultPlatform = platform;
   }
 
   static void reassembleApplication() {
-      WidgetsBinding.instance!.reassembleApplication();
+    WidgetsBinding.instance!.reassembleApplication();
   }
 
   const PlatformWidget({
@@ -64,8 +60,8 @@ class _PlatformWidgetState extends State<PlatformWidget> {
     switch (PlatformWidget._defaultPlatform) {
       case TargetPlatform.android:
         return widget.androidBuilder(context);
-      case TargetPlatform.iOS:      
-        return widget.iosBuilder(context);        
+      case TargetPlatform.iOS:
+        return widget.iosBuilder(context);
       default:
         assert(false, 'Unexpected platform ${PlatformWidget._defaultPlatform}');
         return Container();

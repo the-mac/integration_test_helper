@@ -71,7 +71,9 @@ class _CounterPageState extends State<CounterPage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
-      bottomSheet: PlatformWidget.isAndroid ? null : const Padding(padding: EdgeInsets.only(bottom: 100.0)),
+      bottomSheet: PlatformWidget.isAndroid
+          ? null
+          : const Padding(padding: EdgeInsets.only(bottom: 100.0)),
     );
   }
 }

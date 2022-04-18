@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +8,7 @@ import 'hello.dart';
 import 'counter.dart';
 import 'languages.dart';
 import 'the_mac.dart';
+import 'forms.dart';
 import 'preferences.dart';
 
 // clear && printf '\e[3J' && flutter run ; flutter clean
@@ -38,57 +38,61 @@ class _MyAppState extends State<MyApp> {
             defaultPlatform: PlatformWidget.platform,
             androidApp: const MaterialApp(home: MyHomePage()),
             iosApp: const CupertinoApp(
-                theme: CupertinoThemeData(brightness: Brightness.light),
-                home: MyHomePage(),
-            )
-        )
-    );
+              theme: CupertinoThemeData(brightness: Brightness.light),
+              home: MyHomePage(),
+            )));
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
-  @override State<MyHomePage> createState() => _MyHomePageState();
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
-  @override void initState() { Prefs.initialize(); }
+  @override
+  void initState() {
+    Prefs.initialize();
+  }
 
   String _getTitle(int index) {
-      switch (index) {
-        case 0: return 'Hello';
-        case 1: return 'Languages';
-        case 2: return 'Counter Sample';
-        case 3: return 'Mobile Community';
-        case 4: return 'Preferences';
-        default: return '';
-      }
+    switch (index) {
+      case 0:
+        return 'Hello';
+      case 1:
+        return 'Languages';
+      case 2:
+        return 'Counter';
+      case 3:
+        return 'Community';
+      case 4:
+        return 'Form Inputs';
+      default:
+        return '';
+    }
   }
 
   String _getTabBarTitle(int index) {
-      return 'Tab Bar ' + _getTitle(index);
+    return 'Tab Bar ' + _getTitle(index);
   }
 
   Widget _getTitleWidget() {
     return Consumer<DrawerManagerProvider>(builder: (context, dmObj, _) {
-      return Text(
-        _getTitle(dmObj.selection),
-        key: const Key('app-bar-text')
-      );
+      return Text(_getTitle(dmObj.selection), key: const Key('app-bar-text'));
     });
   }
 
   Widget _buildAndroidHomePage(BuildContext context) {
-
     final drawerSelections = [
       const HelloPage(),
       const LanguagesPage(),
       const CounterPage(),
       const TheMACPage(),
-      PreferencesPage()
+      const FormsPage(),
+      // PreferencesPage()
     ];
-    
+
     final manager = Provider.of<DrawerManagerProvider>(context, listen: false);
 
     return Scaffold(
@@ -148,13 +152,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 // RUN A BACKEND Signup OPERATION
               },
             ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Divider(),
+            ),
             DrawerTile(
-              key: const Key('drawer-preferences'),
+              key: const Key('drawer-forms'),
               context: context,
-              leading: const Icon(Icons.settings),
+              leading: const Icon(Icons.input),
               title: Text(_getTitle(4)),
               onTap: () async {
-                // RUN A BACKEND Preferences OPERATION
+                // RUN A BACKEND Signup OPERATION
               },
             ),
           ],
@@ -163,71 +171,65 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildIosHomePage(BuildContext context) {
-
     return CupertinoTabScaffold(
-        tabBar: CupertinoTabBar(
-            items: [
-                BottomNavigationBarItem(
-                    label: _getTitle(0),
-                    tooltip: _getTabBarTitle(0),
-                    icon: const Icon(Icons.hail_rounded),
-                ),
-                BottomNavigationBarItem(
-                    label: _getTitle(1),
-                    tooltip: _getTabBarTitle(1),
-                    icon: const Icon(Icons.hail_rounded),
-                ),
-                BottomNavigationBarItem(
-                    label: _getTitle(2),
-                    tooltip: _getTabBarTitle(2),
-                    icon: const Icon(Icons.calculate),
-                ),
-                BottomNavigationBarItem(
-                    label: _getTitle(3),
-                    tooltip: _getTabBarTitle(3),
-                    icon: const Icon(Icons.plus_one),
-                ),
-                BottomNavigationBarItem(
-                    label: _getTitle(4),
-                    tooltip: _getTabBarTitle(4),
-                    icon: const Icon(Icons.settings),
-                ),
-            ],
-        ),
-        // ignore: avoid_types_on_closure_parameters
-        tabBuilder: (BuildContext context, int index) {
-            final title = _getTitle(index);
-            switch (index) {
-            case 0:
-                return CupertinoTabView(
-                    // defaultTitle: title,
-                    builder: (context) => const HelloPage(),
-                );
-            case 1:
-                return CupertinoTabView(
-                    // defaultTitle: title,
-                    builder: (context) => const LanguagesPage(),
-                );
-            case 2:
-                return CupertinoTabView(
-                    // defaultTitle: title,
-                    builder: (context) => const CounterPage(),
-                );
-            case 3:
-                return CupertinoTabView(
-                    // defaultTitle: title,
-                    builder: (context) => const TheMACPage(),
-                );
-            case 4:
-                return CupertinoTabView(
-                    // defaultTitle: title,
-                    builder: (context) => PreferencesPage(),
-                );
-            default:
-                assert(false, 'Unexpected tab');
-                return Container();
-            }
-        },
+      tabBar: CupertinoTabBar(
+        items: [
+          BottomNavigationBarItem(
+            label: _getTitle(0),
+            tooltip: _getTabBarTitle(0),
+            icon: const Icon(Icons.hail_rounded),
+          ),
+          BottomNavigationBarItem(
+            label: _getTitle(1),
+            tooltip: _getTabBarTitle(1),
+            icon: const Icon(Icons.hail_rounded),
+          ),
+          BottomNavigationBarItem(
+            label: _getTitle(2),
+            tooltip: _getTabBarTitle(2),
+            icon: const Icon(Icons.calculate),
+          ),
+          BottomNavigationBarItem(
+            label: _getTitle(3),
+            tooltip: _getTabBarTitle(3),
+            icon: const Icon(Icons.plus_one),
+          ),
+          BottomNavigationBarItem(
+            label: _getTitle(4),
+            tooltip: _getTabBarTitle(4),
+            icon: const Icon(Icons.input),
+          ),
+        ],
+      ),
+      // ignore: avoid_types_on_closure_parameters
+      tabBuilder: (BuildContext context, int index) {
+        final title = _getTitle(index);
+        switch (index) {
+          case 0:
+            return CupertinoTabView(
+              builder: (context) => const HelloPage(),
+            );
+          case 1:
+            return CupertinoTabView(
+              builder: (context) => const LanguagesPage(),
+            );
+          case 2:
+            return CupertinoTabView(
+              builder: (context) => const CounterPage(),
+            );
+          case 3:
+            return CupertinoTabView(
+              builder: (context) => const TheMACPage(),
+            );
+          case 4:
+            return CupertinoTabView(
+              builder: (context) => const FormsPage(),
+            );
+          default:
+            assert(false, 'Unexpected tab');
+            return Container();
+        }
+      },
     );
   }
 
@@ -244,5 +246,4 @@ class _MyHomePageState extends State<MyHomePage> {
     Prefs.clearPreferences();
     super.dispose();
   }
-  
 }
