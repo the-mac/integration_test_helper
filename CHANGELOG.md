@@ -1,3 +1,12 @@
+## 0.0.8
+
+* Added BaseIntegrationTest class documentation
+* Added Platform Date Picker method selectPlatformDate
+* Adding Slider testing method changeSliderForTooltip
+* Adding Slider testing method changeSliderForType
+* Adding Slider testing method changeSliderForKey
+* Adding form tests to example project
+
 ## 0.0.7
 
 * Adding waitForUI call after binding.takeScreenshot

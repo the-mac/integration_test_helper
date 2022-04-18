@@ -1,3 +1,7 @@
+<p align="center">
+  <a href="https://pub.dartlang.org/packages/integration_test_helper"><img src="https://img.shields.io/pub/v/integration_test_helper.svg"></a>
+</p>
+
 The Integration Test Helper has pre-configured methods that allow for faster test deployment for end to end (e2e) test coverage (using Android and iOS platform UIs).
 
 <table border="0">
@@ -21,7 +25,7 @@ The Integration Test Helper has pre-configured methods that allow for faster tes
 
 The Integration Test Helper is built on top of [Flutter's Integration Tests](https://docs.flutter.dev/testing/integration-tests). Running End to End (e2e) tests can become bloated and unorganized code, and [lead to regressions](https://en.wikipedia.org/wiki/Software_regression) but with this helper, writing tests can be faster, modular and with [full test coverage](https://www.simform.com/blog/test-coverage/). This approach allows for a cleaner development experience, and [less regressions within your apps](https://www.gratasoftware.com/what-is-regression-in-software-development/).
 
-[![Regression Testing](https://raw.githubusercontent.com/the-mac/integration_test_helper/main/media/integration_test_4.png)](https://youtu.be/0wHKVXbsppw)
+[![Regression Testing](https://i3.ytimg.com/vi/yCRgB2TA6C0/maxresdefault.jpg)](https://youtu.be/yCRgB2TA6C0)
 
 Integration Test Helper (or the BaseIntegrationTest class) allows for [BlackBox Testing](https://www.guru99.com/black-box-testing.html) using fixture data. The fixtures currently support JSON data, and can be loaded from anywhere within the project folder. Here is what the fixture test data (assets/fixtures/languages.json) looks like that is being blackbox tested...
 
