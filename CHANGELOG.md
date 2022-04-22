@@ -1,3 +1,8 @@
+## 0.0.9
+
+* Added scrollPicker method
+* Added CupertinoDatePicker support for all screens
+
 ## 0.0.8
 
 * Added BaseIntegrationTest class documentation

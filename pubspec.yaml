@@ -1,6 +1,6 @@
 name: integration_test_helper
 description: The Integration Test Helper has pre-configured methods that allow for faster test deployment for end to end (e2e) test coverage.
-version: 0.0.8
+version: 0.0.9
 homepage: https://github.com/the-mac/integration_test_helper
 
 environment:

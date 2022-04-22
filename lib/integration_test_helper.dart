@@ -1,7 +1,6 @@
 library integration_test_helper;
 
 import 'dart:convert';
-import 'package:intl/intl.dart' as intl;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
@@ -286,17 +285,15 @@ abstract class BaseIntegrationTest {
   }
 
   Future<void> scrollToListItemText(String listKey, String itemText) async {
+
     final listFinder = find.byKey(Key(listKey));
     final itemFinder = find.text(itemText);
 
-    // scrollable finders
     final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
     final scrollableOfList =
         find.descendant(of: listFinder, matching: scrollable);
 
-    await tester.scrollUntilVisible(itemFinder, 200.0,
-        scrollable: scrollableOfList,
-        duration: const Duration(milliseconds: 1500));
+    await tester.scrollUntilVisible(itemFinder, 200.0, scrollable: scrollableOfList, duration: const Duration(milliseconds: 1500));
     await tester.pump();
   }
 
@@ -337,33 +334,20 @@ abstract class BaseIntegrationTest {
       var newMonthPosition = monthArray.indexOf(newMonth);
       var newMonthOffset = startingMonthPosition - newMonthPosition;
 
-      // print('startingMonthPosition: $startingMonthPosition');
-      // print('newMonthPosition: $newMonthPosition');
-      // print('newMonthOffset: $newMonthOffset');
-
       assert(monthArray.contains(newMonth),
           'That is not a full month name (like January, February, etc.): $newMonth');
 
       if (newMonthPosition > startingMonthPosition) {
         for (int index = 0; index < newMonthOffset.abs(); index++) {
-          // print('index $index');
           await tapForIconTooltip('Next month');
-          // print('await tapForIconTooltip(Next month)');
         }
       } else if (newMonthPosition < startingMonthPosition) {
         for (int index = 0; index < newMonthOffset.abs(); index++) {
-          // print('index $index');
           await tapForIconTooltip('Previous month');
-          // print('await tapForIconTooltip(Previous month)');
         }
       }
-
-      // String platformType = await isPlatformAndroid() ? 'android' : 'ios';
-      // String screenshotPath = 'screenshots/$platformType/form_widgets_3.png';
-      // print('Setting up screenshot: $screenshotPath');
-      // await takeScreenshot(screenshotPath);
-
       await waitForUI();
+
     }
 
     if (newDay > 0) {
@@ -376,70 +360,52 @@ abstract class BaseIntegrationTest {
     await tapWidget('OK');
   }
 
+  Future<void> scrollPicker(Finder widgetFinder, String pickerElement) async {
+
+    await waitForUI();
+    final scrollable = find.byWidgetPredicate((w) => w is Scrollable);
+    final scrollableOfList = find.descendant(of: widgetFinder, matching: scrollable);
+
+    await waitForUI();
+    
+    final itemFinder = find.text(pickerElement);
+    await tester.scrollUntilVisible(itemFinder, 200.0, scrollable: scrollableOfList, duration: const Duration(milliseconds: 1500));
+    await waitForUI();
+      
+  }
+
   Future<void> _scrollCupertinoDatePicker(
       List<String> monthArray, DateTime startingDate,
       {String newMonth = '', int newDay = 0, int newYear = 0}) async {
+
+    // https://www.kindacode.com/article/flutter-how-to-get-width-and-height-of-a-widget/
     // https://github.com/flutter/flutter/blob/61a0add2865c51bfee33939c1820709d1115c77d/packages/flutter/test/cupertino/date_picker_test.dart
     // https://github.com/flutter/flutter/blob/a88888e448b67a6d5351f12c1ed6b85cf363963a/packages/flutter/test/cupertino/picker_test.dart
 
-    var startingMonthPosition = startingDate.month - 1;
-    var startingMonth = monthArray[startingMonthPosition];
-    var startingDay = startingDate.day;
-    var startingYear = startingDate.year;
+    await waitForUI();
 
-    expect(find.text(startingMonth), findsOneWidget);
-    expect(find.text('$startingDay'), findsOneWidget);
-    expect(find.text('$startingYear'), findsOneWidget);
+    final cupertinoPickers = find.byWidgetPredicate((w) => w is CupertinoPicker);
 
-    const Offset _kRowOffset = Offset(0.0, -50.0);
+    final monthPicker = cupertinoPickers.at(0);
+    final dayPicker = cupertinoPickers.at(1);
+    final yearPicker = cupertinoPickers.at(2);
 
-    if (newMonth.isNotEmpty) {
-      assert(monthArray.contains(newMonth),
-          'That is not a full month name (like January, February, etc.): $newMonth');
-      var newMonthOffset = startingMonthPosition - monthArray.indexOf(newMonth);
+    expect(monthPicker, findsOneWidget);
+    expect(dayPicker, findsOneWidget);
+    expect(yearPicker, findsOneWidget);
 
-      const Offset deltaOffset = Offset(0.0, -10.0);
-      await tester.drag(
-          find.text(startingMonth),
-          -((_kRowOffset - deltaOffset) * newMonthOffset.toDouble() +
-              deltaOffset),
-          warnIfMissed: false);
-      await waitForUI();
-    }
+    await scrollPicker(monthPicker, newMonth);
+    await scrollPicker(dayPicker, '$newDay');
+    await scrollPicker(yearPicker, '$newYear');
 
-    if (newDay != 0) {
-      // var newDayOffset = newDay - startingDay;
-      // await tester.drag(find.text('$startingDay'), _kRowOffset * newDayOffset.toDouble(), warnIfMissed: false); // Small Device: 2/5/2023,
-      // var newDayOffset = startingDay - newDay;
+    await waitForUI();
 
-      // const Offset deltaOffset = Offset(0.0, -10.0);
-      // await tester.drag(find.text('$startingDay'), -((_kRowOffset - deltaOffset) * newDayOffset.toDouble() + deltaOffset), warnIfMissed: false); // Small Device: 2/7/2023,
+    final cupertinoDatePicker = find.byType(CupertinoDatePicker);
 
-      var newDayOffset = startingDay - newDay;
-      const Offset deltaOffset = Offset(0.0, -20.0);
-      await tester.drag(
-          find.text('$startingDay'),
-          -((_kRowOffset - deltaOffset) * newDayOffset.toDouble() +
-              deltaOffset),
-          warnIfMissed: false); // Small Device: 2/8/2023,
+    final Offset aboveDatePicker = tester.getTopLeft(cupertinoDatePicker) - const Offset(0.0, 150.0);
+    await tester.tapAt(aboveDatePicker);
+    await waitForUI(durationMultiple: 3);
 
-      await waitForUI();
-    }
-
-    if (newYear != 0) {
-      var newYearOffset = newYear - startingYear;
-      await tester.drag(
-          find.text('$startingYear'), _kRowOffset * newYearOffset.toDouble(),
-          warnIfMissed: false);
-      await waitForUI();
-    }
-
-    // String platformType = await isPlatformAndroid() ? 'android' : 'ios';
-    // String screenshotPath = 'screenshots/$platformType/form_widgets_3b_${newMonth}_$newDay.png';
-    // print('Setting up screenshot: $screenshotPath');
-    // await takeScreenshot(screenshotPath);
-
-    await dismissModal();
   }
 
   /// The selectPlatformDate method allows for testing of an Android DatePickerDialog, and an iOS CupertinoDatePicker and 
@@ -450,9 +416,8 @@ abstract class BaseIntegrationTest {
   /// own custom implementation of the BaseIntegrationTest class.
   Future<void> selectPlatformDate(
       DateTime startingDate, DateTime endingDate) async {
+
     await waitForUI();
-    // print('startingDate: $startingDate');
-    // print('endingDate: $endingDate');
 
     var monthArray = [
       "January",
@@ -474,15 +439,6 @@ abstract class BaseIntegrationTest {
     int newDay = endingDate.day;
     int newYear = endingDate.year;
 
-    // String platformType = await isPlatformAndroid() ? 'android' : 'ios';
-    // String screenshotPath = 'screenshots/$platformType/form_widgets_3a_${newMonth}_$newDay.png';
-    // print('Setting up screenshot: $screenshotPath');
-    // await takeScreenshot(screenshotPath);
-
-    // print('newMonth: $newMonth');
-    // print('newDay: $newDay');
-    // print('newYear: $newYear');
-
     if (await isPlatformAndroid()) {
       await _navigateDatePicker(monthArray, startingDate,
           newMonth: newMonth, newDay: newDay, newYear: newYear);
@@ -491,6 +447,7 @@ abstract class BaseIntegrationTest {
           newMonth: newMonth, newDay: newDay, newYear: newYear);
     }
     await waitForUI();
+
   }
 
   Future<void> changeSliderForKey(String fieldKey,
@@ -535,7 +492,31 @@ abstract class BaseIntegrationTest {
     await waitForUI();
   }
 
+  Future<void> dismissBottomSheet() async {
+
+    await waitForUI();
+
+    final cupertinoBottomSheets = find.byWidgetPredicate((w) => w is BottomSheet);
+
+    print('cupertinoBottomSheets: $cupertinoBottomSheets');
+    final cupertinoBottomSheet = cupertinoBottomSheets.at(0);
+
+    await tester.drag(cupertinoBottomSheet, const Offset(0.0, 150.0));
+    await waitForUI(durationMultiple: 3);
+
+  }
+
   Future<void> dismissModal() async {
-    await tester.tapAt(const Offset(100, 100));
+
+    await waitForUI();
+
+    final modalBarrier = find.byType(ModalBarrier);
+    final aboveModalBarrier = tester.getTopLeft(modalBarrier) - const Offset(0.0, 150.0);
+
+    await tester.tapAt(aboveModalBarrier);
+    await waitForUI();
+    
+    // await tester.tapAt(const Offset(100, 100));
+    // await waitForUI();
   }
 }
